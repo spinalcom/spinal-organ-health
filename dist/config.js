@@ -36,7 +36,7 @@ const config = {
         path: process.env.SPINAL_DTWIN_PATH,
     },
     monitoringApiConfig: {
-        TokenBosRegister: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybU5hbWUiOiJib3MxIiwiaWF0IjoxNjg3ODY0NjkyLCJleHAiOjE2ODc5NTEwOTJ9.7TWzcqXLbnPFFeFSrVeXvffpkzKXyzc3BG0UPKsi1HM",
+        TokenBosRegister: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybU5hbWUiOiJib3MxIiwiaWF0IjoxNjkzOTI1MzMyLCJleHAiOjE2OTQwMTE3MzJ9.RQiFwFO-fwAIQtDb43Nbq3BRq6R3ajUfKfQXJTyxvLA",
         monitoring_url: "http://localhost:5050",
         organName: "app",
         email: "adminMonitoring@spinalcom.com",

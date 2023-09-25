@@ -90,27 +90,37 @@ class LoadConfigFiles {
   }
   public async pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any) {
     try {
+      console.log("request sensed");
+
       let infoFiles = [];
       for (const file of files) {
-        let infofile = {
-          genericOrganData: {
-            name: file.genericOrganData?.name.get(),
-            bootTimestamp: file.genericOrganData?.bootTimestamp.get(),
-            lastHealthTime: file.genericOrganData?.lastHealthTime.get(),
-            ramHeapUsed: file.genericOrganData?.ramHeapUsed.get(),
-            logList: [],
-          },
-          specificOrganData: {
-            state: file.specificOrganData.state?.get(),
-            ipAdress: file.specificOrganData.ipAdress?.get(),
-            port: file.specificOrganData.port?.get(),
-            protocol: file.specificOrganData.protocol?.get(),
-            lastAction: {
-              message: file.specificOrganData.lastAction.message?.get(),
-              date: file.specificOrganData.lastAction.date?.get()
-            }
-          },
+        let infofile;
+        try {
+          infofile = {
+            genericOrganData: {
+              id: file.genericOrganData?.id.get(),
+              name: file.genericOrganData?.name.get(),
+              bootTimestamp: file.genericOrganData?.bootTimestamp.get(),
+              lastHealthTime: file.genericOrganData?.lastHealthTime.get(),
+              ramRssUsed: file.genericOrganData?.ramRssUsed.get(),
+              macAdress: file.genericOrganData?.macAdress.get(),
+              logList: [],
+            },
+            specificOrganData: {
+              state: file.specificOrganData.state?.get(),
+              ipAdress: file.specificOrganData.ipAdress?.get(),
+              port: file.specificOrganData.port?.get(),
+              // protocol: file.specificOrganData.protocol?.get(),
+              lastAction: {
+                message: file.specificOrganData.lastAction.message?.get(),
+                date: file.specificOrganData.lastAction.date?.get()
+              }
+            },
+          }
+        } catch (error) {
+
         }
+
         infoFiles.push(infofile)
       }
       const objBosFile = {

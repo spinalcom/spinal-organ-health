@@ -114,30 +114,38 @@ class LoadConfigFiles {
         });
     }
     pushDataInMonitoringPlatform(apiConnector, files) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log("request sensed");
                 let infoFiles = [];
                 for (const file of files) {
-                    let infofile = {
-                        genericOrganData: {
-                            name: (_a = file.genericOrganData) === null || _a === void 0 ? void 0 : _a.name.get(),
-                            bootTimestamp: (_b = file.genericOrganData) === null || _b === void 0 ? void 0 : _b.bootTimestamp.get(),
-                            lastHealthTime: (_c = file.genericOrganData) === null || _c === void 0 ? void 0 : _c.lastHealthTime.get(),
-                            ramHeapUsed: (_d = file.genericOrganData) === null || _d === void 0 ? void 0 : _d.ramHeapUsed.get(),
-                            logList: [],
-                        },
-                        specificOrganData: {
-                            state: (_e = file.specificOrganData.state) === null || _e === void 0 ? void 0 : _e.get(),
-                            ipAdress: (_f = file.specificOrganData.ipAdress) === null || _f === void 0 ? void 0 : _f.get(),
-                            port: (_g = file.specificOrganData.port) === null || _g === void 0 ? void 0 : _g.get(),
-                            protocol: (_h = file.specificOrganData.protocol) === null || _h === void 0 ? void 0 : _h.get(),
-                            lastAction: {
-                                message: (_j = file.specificOrganData.lastAction.message) === null || _j === void 0 ? void 0 : _j.get(),
-                                date: (_k = file.specificOrganData.lastAction.date) === null || _k === void 0 ? void 0 : _k.get()
-                            }
-                        },
-                    };
+                    let infofile;
+                    try {
+                        infofile = {
+                            genericOrganData: {
+                                id: (_a = file.genericOrganData) === null || _a === void 0 ? void 0 : _a.id.get(),
+                                name: (_b = file.genericOrganData) === null || _b === void 0 ? void 0 : _b.name.get(),
+                                bootTimestamp: (_c = file.genericOrganData) === null || _c === void 0 ? void 0 : _c.bootTimestamp.get(),
+                                lastHealthTime: (_d = file.genericOrganData) === null || _d === void 0 ? void 0 : _d.lastHealthTime.get(),
+                                ramRssUsed: (_e = file.genericOrganData) === null || _e === void 0 ? void 0 : _e.ramRssUsed.get(),
+                                macAdress: (_f = file.genericOrganData) === null || _f === void 0 ? void 0 : _f.macAdress.get(),
+                                logList: [],
+                            },
+                            specificOrganData: {
+                                state: (_g = file.specificOrganData.state) === null || _g === void 0 ? void 0 : _g.get(),
+                                ipAdress: (_h = file.specificOrganData.ipAdress) === null || _h === void 0 ? void 0 : _h.get(),
+                                port: (_j = file.specificOrganData.port) === null || _j === void 0 ? void 0 : _j.get(),
+                                // protocol: file.specificOrganData.protocol?.get(),
+                                lastAction: {
+                                    message: (_k = file.specificOrganData.lastAction.message) === null || _k === void 0 ? void 0 : _k.get(),
+                                    date: (_l = file.specificOrganData.lastAction.date) === null || _l === void 0 ? void 0 : _l.get()
+                                }
+                            },
+                        };
+                    }
+                    catch (error) {
+                    }
                     infoFiles.push(infofile);
                 }
                 const objBosFile = {
