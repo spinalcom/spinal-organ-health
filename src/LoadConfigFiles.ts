@@ -25,9 +25,7 @@
 import { Lst, spinalCore, Model } from "spinal-core-connectorjs";
 import * as path from "path";
 import config from './config';
-import axios, { AxiosRequestConfig } from "axios";
 import { ApiConnector } from './ApiConnector';
-const querystring = require('querystring');
 import ConfigFile from 'spinal-lib-organ-monitoring';
 
 
@@ -49,17 +47,19 @@ class LoadConfigFiles {
     const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
     // initialize the connection
     conn = spinalCore.connect(connect_opt);
-    const fileName = process.env.ORGAN_NAME + '-config';
+    const fileName = process.env.ORGAN_NAME;
+    const type = process.env.ORGAN_TYPE;
     const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP
-    const Protocol = process.env.SPINALHUB_PROTOCOL === undefined ? "" : process.env.SPINALHUB_PROTOCOL
     const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT
-    ConfigFile.init(
-      conn,
-      fileName,
-      Ip,
-      Protocol,
-      parseInt(RequestPort)
-    );
+    if (fileName !== undefined && type !== undefined) {
+      ConfigFile.init(
+        conn,
+        fileName,
+        type,
+        Ip,
+        parseInt(RequestPort)
+      );
+    }
     let bootTimestamp
     conn.load_or_make_dir("/etc", async (directory: spinal.Directory) => {
       for (const file of directory) {
@@ -91,7 +91,6 @@ class LoadConfigFiles {
   public async pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any) {
     try {
       console.log("request sensed");
-
       let infoFiles = [];
       for (const file of files) {
         let infofile;
@@ -117,10 +116,7 @@ class LoadConfigFiles {
               }
             },
           }
-        } catch (error) {
-
-        }
-
+        } catch (error) { }
         infoFiles.push(infofile)
       }
       const objBosFile = {

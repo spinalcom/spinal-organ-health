@@ -62,7 +62,6 @@ const spinal_core_connectorjs_1 = require("spinal-core-connectorjs");
 const path = __importStar(require("path"));
 const config_1 = __importDefault(require("./config"));
 const ApiConnector_1 = require("./ApiConnector");
-const querystring = require('querystring');
 const spinal_lib_organ_monitoring_1 = __importDefault(require("spinal-lib-organ-monitoring"));
 class LoadConfigFiles {
     constructor() {
@@ -80,11 +79,13 @@ class LoadConfigFiles {
             const connect_opt = `http://${config_1.default.spinalConnector.user}:${config_1.default.spinalConnector.password}@${config_1.default.spinalConnector.host}:${config_1.default.spinalConnector.port}/`;
             // initialize the connection
             conn = spinal_core_connectorjs_1.spinalCore.connect(connect_opt);
-            const fileName = process.env.ORGAN_NAME + '-config';
+            const fileName = process.env.ORGAN_NAME;
+            const type = process.env.ORGAN_TYPE;
             const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP;
-            const Protocol = process.env.SPINALHUB_PROTOCOL === undefined ? "" : process.env.SPINALHUB_PROTOCOL;
             const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT;
-            spinal_lib_organ_monitoring_1.default.init(conn, fileName, Ip, Protocol, parseInt(RequestPort));
+            if (fileName !== undefined && type !== undefined) {
+                spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
+            }
             let bootTimestamp;
             conn.load_or_make_dir("/etc", (directory) => __awaiter(this, void 0, void 0, function* () {
                 for (const file of directory) {
@@ -114,45 +115,44 @@ class LoadConfigFiles {
         });
     }
     pushDataInMonitoringPlatform(apiConnector, files) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log("request sensed");
                 let infoFiles = [];
                 for (const file of files) {
-                    let infofile;
-                    try {
-                        infofile = {
-                            genericOrganData: {
-                                id: (_a = file.genericOrganData) === null || _a === void 0 ? void 0 : _a.id.get(),
-                                name: (_b = file.genericOrganData) === null || _b === void 0 ? void 0 : _b.name.get(),
-                                bootTimestamp: (_c = file.genericOrganData) === null || _c === void 0 ? void 0 : _c.bootTimestamp.get(),
-                                lastHealthTime: (_d = file.genericOrganData) === null || _d === void 0 ? void 0 : _d.lastHealthTime.get(),
-                                ramRssUsed: (_e = file.genericOrganData) === null || _e === void 0 ? void 0 : _e.ramRssUsed.get(),
-                                macAdress: (_f = file.genericOrganData) === null || _f === void 0 ? void 0 : _f.macAdress.get(),
-                                logList: [],
-                            },
-                            specificOrganData: {
-                                state: (_g = file.specificOrganData.state) === null || _g === void 0 ? void 0 : _g.get(),
-                                ipAdress: (_h = file.specificOrganData.ipAdress) === null || _h === void 0 ? void 0 : _h.get(),
-                                port: (_j = file.specificOrganData.port) === null || _j === void 0 ? void 0 : _j.get(),
-                                // protocol: file.specificOrganData.protocol?.get(),
-                                lastAction: {
-                                    message: (_k = file.specificOrganData.lastAction.message) === null || _k === void 0 ? void 0 : _k.get(),
-                                    date: (_l = file.specificOrganData.lastAction.date) === null || _l === void 0 ? void 0 : _l.get()
-                                }
-                            },
-                        };
-                    }
-                    catch (error) {
-                    }
-                    infoFiles.push(infofile);
+                    console.log(file);
+                    // let infofile;
+                    // try {
+                    //   infofile = {
+                    //     genericOrganData: {
+                    //       id: file.genericOrganData?.id.get(),
+                    //       name: file.genericOrganData?.name.get(),
+                    //       bootTimestamp: file.genericOrganData?.bootTimestamp.get(),
+                    //       lastHealthTime: file.genericOrganData?.lastHealthTime.get(),
+                    //       ramRssUsed: file.genericOrganData?.ramRssUsed.get(),
+                    //       macAdress: file.genericOrganData?.macAdress.get(),
+                    //       logList: [],
+                    //     },
+                    //     specificOrganData: {
+                    //       state: file.specificOrganData.state?.get(),
+                    //       ipAdress: file.specificOrganData.ipAdress?.get(),
+                    //       port: file.specificOrganData.port?.get(),
+                    //       // protocol: file.specificOrganData.protocol?.get(),
+                    //       lastAction: {
+                    //         message: file.specificOrganData.lastAction.message?.get(),
+                    //         date: file.specificOrganData.lastAction.date?.get()
+                    //       }
+                    //     },
+                    //   }
+                    // } catch (error) {
+                    // }
+                    // infoFiles.push(infofile)
                 }
-                const objBosFile = {
-                    TokenBosRegister: config_1.default.monitoringApiConfig.TokenBosRegister,
-                    infoOrgans: infoFiles
-                };
-                const rep = yield apiConnector.post("http://localhost:5050/health", objBosFile);
+                // const objBosFile = {
+                //   TokenBosRegister: config.monitoringApiConfig.TokenBosRegister,
+                //   infoOrgans: infoFiles
+                // }
+                // const rep = await apiConnector.post("http://localhost:5050/health", objBosFile)
             }
             catch (error) {
                 console.error(error);

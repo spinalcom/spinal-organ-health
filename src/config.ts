@@ -30,10 +30,6 @@ const config = {
     host: process.env.SPINALHUB_IP, // can be an ip address
     port: process.env.SPINALHUB_PORT, // port
   },
-  file: {
-    // path to a digital twin in spinalhub filesystem
-    path: process.env.SPINAL_DTWIN_PATH,
-  },
   monitoringApiConfig: {
     TokenBosRegister: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybU5hbWUiOiJib3MxIiwiaWF0IjoxNjkzOTI1MzMyLCJleHAiOjE2OTQwMTE3MzJ9.RQiFwFO-fwAIQtDb43Nbq3BRq6R3ajUfKfQXJTyxvLA",
     monitoring_url: "http://localhost:5050",
