@@ -6,16 +6,14 @@ declare const config: {
         host: string | undefined;
         port: string | undefined;
     };
-    file: {
-        path: string | undefined;
-    };
     monitoringApiConfig: {
-        TokenBosRegister: string;
-        monitoring_url: string;
-        organName: string;
-        email: string;
-        password: string;
-        grant_type: string;
+        TokenBosRegister: string | undefined;
+        monitoring_url: string | undefined;
+        monitoring_helath_url: string | undefined;
+        organName: string | undefined;
+        email: string | undefined;
+        password: string | undefined;
+        grant_type: string | undefined;
     };
 };
 export default config;

@@ -86,73 +86,85 @@ class LoadConfigFiles {
             if (fileName !== undefined && type !== undefined) {
                 spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
             }
-            let bootTimestamp;
-            conn.load_or_make_dir("/etc", (directory) => __awaiter(this, void 0, void 0, function* () {
+            const promiseEtc = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                const directory = yield conn.load_or_make_dir("/etc");
                 for (const file of directory) {
                     if (file) {
                         // @ts-ignore
                         if (file._info.model_type.get() === "model_status") {
                             var fileLoaded = yield file.load();
-                            bootTimestamp = fileLoaded.boot_timestamp.get();
-                            return bootTimestamp;
+                            resolve(fileLoaded);
+                            return;
                         }
                     }
                 }
+                reject("/etc not Found");
             }));
-            conn.load_or_make_dir("/etc/Organs", (directory) => __awaiter(this, void 0, void 0, function* () {
+            const promisesOrganFiles = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b;
+                const directory = yield conn.load_or_make_dir("/etc/Organs");
+                if (!directory)
+                    reject("/etc/organs not Found");
                 const files = [];
                 for (const file of directory) {
-                    // @ts-ignore
-                    if (file._info.model_type.get() === "ConfigFile") {
-                        const fileLoaded = yield this._loadConfigFiles(conn, file.name.get()).then((file) => {
-                            return file;
-                        });
-                        files.push(fileLoaded);
+                    if (((_b = (_a = file._info) === null || _a === void 0 ? void 0 : _a.model_type) === null || _b === void 0 ? void 0 : _b.get()) === "ConfigFile") {
+                        files.push(file._ptr.load());
                     }
                 }
-                yield this.pushDataInMonitoringPlatform(this.apiConnector, files);
+                resolve(Promise.all(files));
             }));
+            const hubStatus = yield promiseEtc;
+            const files = yield promisesOrganFiles;
+            yield this.pushDataInMonitoringPlatform(this.apiConnector, files, hubStatus);
         });
     }
-    pushDataInMonitoringPlatform(apiConnector, files) {
+    pushDataInMonitoringPlatform(apiConnector, files, hubStatus) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log("request sensed");
                 let infoFiles = [];
                 for (const file of files) {
-                    console.log(file);
-                    // let infofile;
-                    // try {
-                    //   infofile = {
-                    //     genericOrganData: {
-                    //       id: file.genericOrganData?.id.get(),
-                    //       name: file.genericOrganData?.name.get(),
-                    //       bootTimestamp: file.genericOrganData?.bootTimestamp.get(),
-                    //       lastHealthTime: file.genericOrganData?.lastHealthTime.get(),
-                    //       ramRssUsed: file.genericOrganData?.ramRssUsed.get(),
-                    //       macAdress: file.genericOrganData?.macAdress.get(),
-                    //       logList: [],
-                    //     },
-                    //     specificOrganData: {
-                    //       state: file.specificOrganData.state?.get(),
-                    //       ipAdress: file.specificOrganData.ipAdress?.get(),
-                    //       port: file.specificOrganData.port?.get(),
-                    //       // protocol: file.specificOrganData.protocol?.get(),
-                    //       lastAction: {
-                    //         message: file.specificOrganData.lastAction.message?.get(),
-                    //         date: file.specificOrganData.lastAction.date?.get()
-                    //       }
-                    //     },
-                    //   }
-                    // } catch (error) {
-                    // }
-                    // infoFiles.push(infofile)
+                    let infofile;
+                    try {
+                        infofile = {
+                            genericOrganData: {
+                                id: (_a = file.genericOrganData) === null || _a === void 0 ? void 0 : _a.id.get(),
+                                name: (_b = file.genericOrganData) === null || _b === void 0 ? void 0 : _b.name.get(),
+                                type: (_c = file.genericOrganData) === null || _c === void 0 ? void 0 : _c.type.get(),
+                                serverName: (_d = file.genericOrganData) === null || _d === void 0 ? void 0 : _d.serverName.get(),
+                                bootTimestamp: (_e = file.genericOrganData) === null || _e === void 0 ? void 0 : _e.bootTimestamp.get(),
+                                lastHealthTime: (_f = file.genericOrganData) === null || _f === void 0 ? void 0 : _f.lastHealthTime.get(),
+                                ramRssUsed: (_g = file.genericOrganData) === null || _g === void 0 ? void 0 : _g.ramRssUsed.get(),
+                                macAdress: (_h = file.genericOrganData) === null || _h === void 0 ? void 0 : _h.macAdress.get(),
+                                logList: [],
+                            },
+                            specificOrganData: {
+                                port: (_j = file.specificOrganData.port) === null || _j === void 0 ? void 0 : _j.get(),
+                                lastAction: {
+                                    message: (_k = file.specificOrganData.lastAction.message) === null || _k === void 0 ? void 0 : _k.get(),
+                                    date: (_l = file.specificOrganData.lastAction.date) === null || _l === void 0 ? void 0 : _l.get()
+                                }
+                            },
+                        };
+                        infoFiles.push(infofile);
+                    }
+                    catch (error) { }
                 }
-                // const objBosFile = {
-                //   TokenBosRegister: config.monitoringApiConfig.TokenBosRegister,
-                //   infoOrgans: infoFiles
-                // }
-                // const rep = await apiConnector.post("http://localhost:5050/health", objBosFile)
+                const objBosFile = {
+                    TokenBosRegister: config_1.default.monitoringApiConfig.TokenBosRegister,
+                    infoHub: {
+                        bootTimestamp: hubStatus.boot_timestamp.get(),
+                        ramUsageRes: hubStatus.ram_usage_res.get() / 1048576,
+                        ramUsageVirt: hubStatus.ram_usage_virt.get() / 1048576,
+                        countSessions: hubStatus.count_sessions.get(),
+                        countUsers: hubStatus.count_users.get()
+                    },
+                    infoOrgans: infoFiles
+                };
+                if (config_1.default.monitoringApiConfig.monitoring_helath_url !== undefined) {
+                    yield apiConnector.post(config_1.default.monitoringApiConfig.monitoring_helath_url, objBosFile);
+                }
             }
             catch (error) {
                 console.error(error);

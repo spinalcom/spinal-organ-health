@@ -22,11 +22,41 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import { Lst, spinalCore, Model } from "spinal-core-connectorjs";
+import { Lst, spinalCore, Model, FileSystem, Val, Str, Bool } from "spinal-core-connectorjs";
 import * as path from "path";
 import config from './config';
 import { ApiConnector } from './ApiConnector';
 import ConfigFile from 'spinal-lib-organ-monitoring';
+
+interface IStatusHubObject extends Model {
+  count_models: Val;
+  count_users: Val;
+  count_sessions: Val;
+  ram_usage_res: Val;
+  ram_usage_virt: Val;
+  btn: IBtn;
+  sessions: ISessionsItem[];
+  data: IData;
+  boot_timestamp: Val;
+}
+interface IBtn extends Model {
+  garbageCollector: Val;
+  backup: Val;
+}
+interface ISessionsItem extends Model {
+  id: Val;
+  timestamp: Val;
+  type: Str;
+  actif: Bool;
+}
+interface IData extends Model {
+  len: Val;
+  count_models: Str;
+  count_users: Str;
+  count_sessions: Str;
+  ram_usage_res: Str;
+  ram_usage_virt: Str;
+}
 
 
 
@@ -42,7 +72,7 @@ class LoadConfigFiles {
   }
 
   public async initFiles(): Promise<any> {
-    let conn: spinal.FileSystem;
+    let conn: FileSystem;
     // connection string to connect to spinalhub
     const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
     // initialize the connection
@@ -60,35 +90,36 @@ class LoadConfigFiles {
         parseInt(RequestPort)
       );
     }
-    let bootTimestamp
-    conn.load_or_make_dir("/etc", async (directory: spinal.Directory) => {
+    const promiseEtc = new Promise<IStatusHubObject>(async (resolve, reject) => {
+      const directory = await conn.load_or_make_dir("/etc")
       for (const file of directory) {
         if (file) {
           // @ts-ignore
           if (file._info.model_type.get() === "model_status") {
             var fileLoaded = await file.load();
-            bootTimestamp = fileLoaded.boot_timestamp.get();
-            return bootTimestamp
+            resolve(fileLoaded);
+            return;
           }
         }
-      }
+      } reject("/etc not Found")
     })
 
-    conn.load_or_make_dir("/etc/Organs", async (directory: spinal.Directory) => {
-      const files: any[] = [];
+    const promisesOrganFiles = new Promise<any[]>(async (resolve, reject) => {
+      const directory = await conn.load_or_make_dir("/etc/Organs")
+      if (!directory) reject("/etc/organs not Found")
+      const files: Promise<any>[] = [];
       for (const file of directory) {
-        // @ts-ignore
-        if (file._info.model_type.get() === "ConfigFile") {
-          const fileLoaded = await this._loadConfigFiles(conn, file.name.get()).then((file) => {
-            return file;
-          });
-          files.push(fileLoaded)
+        if (file._info?.model_type?.get() === "ConfigFile") {
+          files.push(file._ptr.load())
         }
       }
-      await this.pushDataInMonitoringPlatform(this.apiConnector, files)
+      resolve(Promise.all(files))
     })
+    const hubStatus = await promiseEtc;
+    const files = await promisesOrganFiles
+    await this.pushDataInMonitoringPlatform(this.apiConnector, files, hubStatus);
   }
-  public async pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any) {
+  public async pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any, hubStatus: IStatusHubObject) {
     try {
       console.log("request sensed");
       let infoFiles = [];
@@ -99,6 +130,8 @@ class LoadConfigFiles {
             genericOrganData: {
               id: file.genericOrganData?.id.get(),
               name: file.genericOrganData?.name.get(),
+              type: file.genericOrganData?.type.get(),
+              serverName: file.genericOrganData?.serverName.get(),
               bootTimestamp: file.genericOrganData?.bootTimestamp.get(),
               lastHealthTime: file.genericOrganData?.lastHealthTime.get(),
               ramRssUsed: file.genericOrganData?.ramRssUsed.get(),
@@ -106,24 +139,30 @@ class LoadConfigFiles {
               logList: [],
             },
             specificOrganData: {
-              state: file.specificOrganData.state?.get(),
-              ipAdress: file.specificOrganData.ipAdress?.get(),
               port: file.specificOrganData.port?.get(),
-              // protocol: file.specificOrganData.protocol?.get(),
               lastAction: {
                 message: file.specificOrganData.lastAction.message?.get(),
                 date: file.specificOrganData.lastAction.date?.get()
               }
             },
           }
+          infoFiles.push(infofile)
         } catch (error) { }
-        infoFiles.push(infofile)
       }
       const objBosFile = {
         TokenBosRegister: config.monitoringApiConfig.TokenBosRegister,
+        infoHub: {
+          bootTimestamp: hubStatus.boot_timestamp.get(),
+          ramUsageRes: hubStatus.ram_usage_res.get() / 1048576,
+          ramUsageVirt: hubStatus.ram_usage_virt.get() / 1048576,
+          countSessions: hubStatus.count_sessions.get(),
+          countUsers: hubStatus.count_users.get()
+        },
         infoOrgans: infoFiles
       }
-      const rep = await apiConnector.post("http://localhost:5050/health", objBosFile)
+      if (config.monitoringApiConfig.monitoring_helath_url !== undefined) {
+        await apiConnector.post(config.monitoringApiConfig.monitoring_helath_url, objBosFile)
+      }
     } catch (error) {
       console.error(error);
       return null;

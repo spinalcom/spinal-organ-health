@@ -31,12 +31,13 @@ const config = {
     port: process.env.SPINALHUB_PORT, // port
   },
   monitoringApiConfig: {
-    TokenBosRegister: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybU5hbWUiOiJib3MxIiwiaWF0IjoxNjkzOTI1MzMyLCJleHAiOjE2OTQwMTE3MzJ9.RQiFwFO-fwAIQtDb43Nbq3BRq6R3ajUfKfQXJTyxvLA",
-    monitoring_url: "http://localhost:5050",
-    organName: "app",
-    email: "adminMonitoring@spinalcom.com",
-    password: "ABu0Rk3tZn",
-    grant_type: "password"
+    TokenBosRegister: process.env.TOKEN_BOS_REGISTER,
+    monitoring_url: process.env.MONITORING_URL,
+    monitoring_helath_url: process.env.MONITORING_HEALTH_URL,
+    organName: process.env.ORGAN_NAME,
+    email: process.env.EMAIL,
+    password: process.env.PASSWORD,
+    grant_type: process.env.GRANT_TYPE
   }
 };
 export default config;
