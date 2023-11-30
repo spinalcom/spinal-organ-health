@@ -71,7 +71,7 @@ class LoadConfigFiles {
     return this.instance;
   }
 
-  public async initFiles(): Promise<any> {
+  public async initFiles(isFirstBoot: boolean): Promise<any> {
     let conn: FileSystem;
     // connection string to connect to spinalhub
     const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
@@ -81,7 +81,7 @@ class LoadConfigFiles {
     const type = process.env.ORGAN_TYPE;
     const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP
     const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT
-    if (fileName !== undefined && type !== undefined) {
+    if (fileName !== undefined && type !== undefined && isFirstBoot) {
       ConfigFile.init(
         conn,
         fileName,

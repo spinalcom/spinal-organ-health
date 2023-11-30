@@ -28,8 +28,12 @@ import cron from 'node-cron';
 
 
 async function main() {
-  cron.schedule('*/1 * * * *', async () => {
-    await LoadConfigFiles.initFiles()
-  });
+  await LoadConfigFiles.initFiles(true);
+  // Delay the start of the cron job by a certain amount of time
+  setTimeout(() => {
+    cron.schedule('*/1 * * * *', async () => {
+      await LoadConfigFiles.initFiles(false);
+    });
+  },5000); // 5 sec delay
 };
 main();

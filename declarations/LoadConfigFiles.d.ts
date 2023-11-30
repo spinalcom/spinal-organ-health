@@ -34,7 +34,7 @@ declare class LoadConfigFiles {
     private apiConnector;
     private constructor();
     static getInstance(): LoadConfigFiles;
-    initFiles(): Promise<any>;
+    initFiles(isFirstBoot: boolean): Promise<any>;
     pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any, hubStatus: IStatusHubObject): Promise<null | undefined>;
     _loadConfigFiles(connect: spinal.FileSystem, fileName: string): Promise<any>;
 }

@@ -41,9 +41,13 @@ const LoadConfigFiles_1 = __importDefault(require("./LoadConfigFiles"));
 const node_cron_1 = __importDefault(require("node-cron"));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        node_cron_1.default.schedule('*/1 * * * *', () => __awaiter(this, void 0, void 0, function* () {
-            yield LoadConfigFiles_1.default.initFiles();
-        }));
+        yield LoadConfigFiles_1.default.initFiles(true);
+        // Delay the start of the cron job by a certain amount of time
+        setTimeout(() => {
+            node_cron_1.default.schedule('*/1 * * * *', () => __awaiter(this, void 0, void 0, function* () {
+                yield LoadConfigFiles_1.default.initFiles(false);
+            }));
+        }, 5000); // 5 sec delay
     });
 }
 ;

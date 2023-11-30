@@ -72,7 +72,7 @@ class LoadConfigFiles {
             this.instance = new LoadConfigFiles();
         return this.instance;
     }
-    initFiles() {
+    initFiles(isFirstBoot) {
         return __awaiter(this, void 0, void 0, function* () {
             let conn;
             // connection string to connect to spinalhub
@@ -83,7 +83,7 @@ class LoadConfigFiles {
             const type = process.env.ORGAN_TYPE;
             const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP;
             const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT;
-            if (fileName !== undefined && type !== undefined) {
+            if (fileName !== undefined && type !== undefined && isFirstBoot) {
                 spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
             }
             const promiseEtc = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
