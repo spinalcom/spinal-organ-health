@@ -105,8 +105,8 @@ class LoadConfigFiles {
     })
 
     const promisesOrganFiles = new Promise<any[]>(async (resolve, reject) => {
-      const directory = await conn.load_or_make_dir("/etc/Organs")
-      if (!directory) reject("/etc/organs not Found")
+      const directory = await conn.load_or_make_dir("/etc/Organs/Monitoring")
+      if (!directory) reject("/etc/Organs/Monitoring not Found")
       const files: Promise<any>[] = [];
       for (const file of directory) {
         if (file._info?.model_type?.get() === "ConfigFile") {
@@ -121,7 +121,7 @@ class LoadConfigFiles {
   }
   public async pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any, hubStatus: IStatusHubObject) {
     try {
-      console.log("request sensed");
+      console.log("Pushing data to monitoring platform...");
       let infoFiles = [];
       for (const file of files) {
         let infofile;
@@ -149,12 +149,13 @@ class LoadConfigFiles {
           infoFiles.push(infofile)
         } catch (error) { }
       }
+      
       const objBosFile = {
         TokenBosRegister: config.monitoringApiConfig.TokenBosRegister,
         infoHub: {
-          bootTimestamp: hubStatus.boot_timestamp.get(),
-          ramUsageRes: hubStatus.ram_usage_res.get() / 1048576,
-          ramUsageVirt: hubStatus.ram_usage_virt.get() / 1048576,
+          bootTimestamp: hubStatus.boot_timestamp?.get(),
+          ramUsageRes: hubStatus.ram_usage_res.get() / 1024,
+          ramUsageVirt: hubStatus.ram_usage_virt.get() / 1024,
           countSessions: hubStatus.count_sessions.get(),
           countUsers: hubStatus.count_users.get()
         },
@@ -162,6 +163,7 @@ class LoadConfigFiles {
       }
       if (config.monitoringApiConfig.monitoring_helath_url !== undefined) {
         await apiConnector.post(config.monitoringApiConfig.monitoring_helath_url, objBosFile)
+        console.log("Pushing data done !")
       }
     } catch (error) {
       console.error(error);
@@ -171,7 +173,7 @@ class LoadConfigFiles {
 
   public async _loadConfigFiles(connect: spinal.FileSystem, fileName: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      spinalCore.load(connect, path.resolve(`/etc/Organs/${fileName}`),
+      spinalCore.load(connect, path.resolve(`/etc/Organs/Monitoring/${fileName}`),
         (file) => resolve(file),
         () => {
           console.log("error load file");

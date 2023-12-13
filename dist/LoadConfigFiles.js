@@ -102,9 +102,9 @@ class LoadConfigFiles {
             }));
             const promisesOrganFiles = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 var _a, _b;
-                const directory = yield conn.load_or_make_dir("/etc/Organs");
+                const directory = yield conn.load_or_make_dir("/etc/Organs/Monitoring");
                 if (!directory)
-                    reject("/etc/organs not Found");
+                    reject("/etc/Organs/Monitoring not Found");
                 const files = [];
                 for (const file of directory) {
                     if (((_b = (_a = file._info) === null || _a === void 0 ? void 0 : _a.model_type) === null || _b === void 0 ? void 0 : _b.get()) === "ConfigFile") {
@@ -119,10 +119,10 @@ class LoadConfigFiles {
         });
     }
     pushDataInMonitoringPlatform(apiConnector, files, hubStatus) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("request sensed");
+                console.log("Pushing data to monitoring platform...");
                 let infoFiles = [];
                 for (const file of files) {
                     let infofile;
@@ -154,9 +154,9 @@ class LoadConfigFiles {
                 const objBosFile = {
                     TokenBosRegister: config_1.default.monitoringApiConfig.TokenBosRegister,
                     infoHub: {
-                        bootTimestamp: hubStatus.boot_timestamp.get(),
-                        ramUsageRes: hubStatus.ram_usage_res.get() / 1048576,
-                        ramUsageVirt: hubStatus.ram_usage_virt.get() / 1048576,
+                        bootTimestamp: (_m = hubStatus.boot_timestamp) === null || _m === void 0 ? void 0 : _m.get(),
+                        ramUsageRes: hubStatus.ram_usage_res.get() / 1024,
+                        ramUsageVirt: hubStatus.ram_usage_virt.get() / 1024,
                         countSessions: hubStatus.count_sessions.get(),
                         countUsers: hubStatus.count_users.get()
                     },
@@ -164,6 +164,7 @@ class LoadConfigFiles {
                 };
                 if (config_1.default.monitoringApiConfig.monitoring_helath_url !== undefined) {
                     yield apiConnector.post(config_1.default.monitoringApiConfig.monitoring_helath_url, objBosFile);
+                    console.log("Pushing data done !");
                 }
             }
             catch (error) {
@@ -175,7 +176,7 @@ class LoadConfigFiles {
     _loadConfigFiles(connect, fileName) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                spinal_core_connectorjs_1.spinalCore.load(connect, path.resolve(`/etc/Organs/${fileName}`), (file) => resolve(file), () => {
+                spinal_core_connectorjs_1.spinalCore.load(connect, path.resolve(`/etc/Organs/Monitoring/${fileName}`), (file) => resolve(file), () => {
                     console.log("error load file");
                     reject("error load file");
                 });
