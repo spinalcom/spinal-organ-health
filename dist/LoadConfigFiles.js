@@ -62,7 +62,6 @@ const spinal_core_connectorjs_1 = require("spinal-core-connectorjs");
 const path = __importStar(require("path"));
 const config_1 = __importDefault(require("./config"));
 const ApiConnector_1 = require("./ApiConnector");
-const spinal_lib_organ_monitoring_1 = __importDefault(require("spinal-lib-organ-monitoring"));
 class LoadConfigFiles {
     constructor() {
         this.apiConnector = new ApiConnector_1.ApiConnector();
@@ -72,20 +71,8 @@ class LoadConfigFiles {
             this.instance = new LoadConfigFiles();
         return this.instance;
     }
-    initFiles(isFirstBoot) {
+    initFiles(conn) {
         return __awaiter(this, void 0, void 0, function* () {
-            let conn;
-            // connection string to connect to spinalhub
-            const connect_opt = `http://${config_1.default.spinalConnector.user}:${config_1.default.spinalConnector.password}@${config_1.default.spinalConnector.host}:${config_1.default.spinalConnector.port}/`;
-            // initialize the connection
-            conn = spinal_core_connectorjs_1.spinalCore.connect(connect_opt);
-            const fileName = process.env.ORGAN_NAME;
-            const type = process.env.ORGAN_TYPE;
-            const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP;
-            const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT;
-            if (fileName !== undefined && type !== undefined && isFirstBoot) {
-                spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
-            }
             const promiseEtc = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 const directory = yield conn.load_or_make_dir("/etc");
                 for (const file of directory) {

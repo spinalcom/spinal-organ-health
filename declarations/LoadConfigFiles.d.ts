@@ -1,4 +1,4 @@
-import { Model, Val, Str, Bool } from "spinal-core-connectorjs";
+import { Model, FileSystem, Val, Str, Bool } from "spinal-core-connectorjs";
 import { ApiConnector } from './ApiConnector';
 interface IStatusHubObject extends Model {
     count_models: Val;
@@ -34,7 +34,7 @@ declare class LoadConfigFiles {
     private apiConnector;
     private constructor();
     static getInstance(): LoadConfigFiles;
-    initFiles(isFirstBoot: boolean): Promise<any>;
+    initFiles(conn: FileSystem): Promise<any>;
     pushDataInMonitoringPlatform(apiConnector: ApiConnector, files: any, hubStatus: IStatusHubObject): Promise<null | undefined>;
     _loadConfigFiles(connect: spinal.FileSystem, fileName: string): Promise<any>;
 }

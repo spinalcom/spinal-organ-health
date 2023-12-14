@@ -25,14 +25,35 @@
 // console.log(ConfigFile);
 import LoadConfigFiles from "./LoadConfigFiles";
 import cron from 'node-cron';
-
+import { Lst, spinalCore, FileSystem } from "spinal-core-connectorjs";
+import config from './config';
+import ConfigFile from 'spinal-lib-organ-monitoring';
 
 async function main() {
-  await LoadConfigFiles.initFiles(true);
+
+  let conn: FileSystem;
+    // connection string to connect to spinalhub
+    const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
+    // initialize the connection
+    conn = spinalCore.connect(connect_opt);
+    const fileName = process.env.ORGAN_NAME;
+    const type = process.env.ORGAN_TYPE;
+    const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP
+    const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT
+    if (fileName !== undefined && type !== undefined) {
+      ConfigFile.init(
+        conn,
+        fileName,
+        type,
+        Ip,
+        parseInt(RequestPort)
+      );
+    }
+  await LoadConfigFiles.initFiles(conn);
   // Delay the start of the cron job by a certain amount of time
   setTimeout(() => {
     cron.schedule('*/1 * * * *', async () => {
-      await LoadConfigFiles.initFiles(false);
+      await LoadConfigFiles.initFiles(conn);
     });
   },5000); // 5 sec delay
 };
