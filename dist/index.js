@@ -54,7 +54,7 @@ function main() {
         const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP;
         const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT;
         if (fileName !== undefined && type !== undefined) {
-            spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
+            yield spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
         }
         yield LoadConfigFiles_1.default.initFiles(conn);
         // Delay the start of the cron job by a certain amount of time

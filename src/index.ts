@@ -41,7 +41,7 @@ async function main() {
     const Ip = process.env.SPINALHUB_IP === undefined ? "" : process.env.SPINALHUB_IP
     const RequestPort = process.env.REQUESTS_PORT === undefined ? "" : process.env.REQUESTS_PORT
     if (fileName !== undefined && type !== undefined) {
-      ConfigFile.init(
+      await ConfigFile.init(
         conn,
         fileName,
         type,
@@ -49,6 +49,8 @@ async function main() {
         parseInt(RequestPort)
       );
     }
+
+
   await LoadConfigFiles.initFiles(conn);
   // Delay the start of the cron job by a certain amount of time
   setTimeout(() => {

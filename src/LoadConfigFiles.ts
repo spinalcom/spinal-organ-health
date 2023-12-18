@@ -72,6 +72,8 @@ class LoadConfigFiles {
   }
 
   public async initFiles(conn: FileSystem): Promise<any> {
+
+    
     const promiseEtc = new Promise<IStatusHubObject>(async (resolve, reject) => {
       const directory = await conn.load_or_make_dir("/etc")
       for (const file of directory) {
