@@ -33,7 +33,12 @@ async function main() {
 
   let conn: FileSystem;
     // connection string to connect to spinalhub
-    const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
+    const protocol = process.env.SPINALHUB_PROTOCOL || "http";
+
+    let connect_opt = `${protocol}://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}`;
+    if (config.spinalConnector.port !== undefined) {
+      connect_opt += `:${config.spinalConnector.port}/`;
+    }
     // initialize the connection
     conn = spinalCore.connect(connect_opt);
     const fileName = process.env.ORGAN_NAME;

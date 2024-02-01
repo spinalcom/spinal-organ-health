@@ -46,7 +46,11 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let conn;
         // connection string to connect to spinalhub
-        const connect_opt = `http://${config_1.default.spinalConnector.user}:${config_1.default.spinalConnector.password}@${config_1.default.spinalConnector.host}:${config_1.default.spinalConnector.port}/`;
+        const protocol = process.env.SPINALHUB_PROTOCOL || "http";
+        let connect_opt = `${protocol}://${config_1.default.spinalConnector.user}:${config_1.default.spinalConnector.password}@${config_1.default.spinalConnector.host}`;
+        if (config_1.default.spinalConnector.port !== undefined) {
+            connect_opt += `:${config_1.default.spinalConnector.port}/`;
+        }
         // initialize the connection
         conn = spinal_core_connectorjs_1.spinalCore.connect(connect_opt);
         const fileName = process.env.ORGAN_NAME;
