@@ -110,6 +110,11 @@ class LoadConfigFiles {
       for (const file of files) {
         let infofile;
         try {
+          /*console.log({
+            name: file.genericOrganData?.name.get(),
+            lastHealthTime: file.genericOrganData?.lastHealthTime.get()
+            server
+          })*/
           infofile = {
             genericOrganData: {
               id: file.genericOrganData?.id.get(),

@@ -55,8 +55,8 @@ async function main() {
       );
     }
 
-
-  await LoadConfigFiles.initFiles(conn);
+  //await LoadConfigFiles.initFiles(conn);
+  
   // Delay the start of the cron job by a certain amount of time
   setTimeout(() => {
     cron.schedule('*/1 * * * *', async () => {

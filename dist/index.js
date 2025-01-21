@@ -60,7 +60,7 @@ function main() {
         if (fileName !== undefined && type !== undefined) {
             yield spinal_lib_organ_monitoring_1.default.init(conn, fileName, type, Ip, parseInt(RequestPort));
         }
-        yield LoadConfigFiles_1.default.initFiles(conn);
+        //await LoadConfigFiles.initFiles(conn);
         // Delay the start of the cron job by a certain amount of time
         setTimeout(() => {
             node_cron_1.default.schedule('*/1 * * * *', () => __awaiter(this, void 0, void 0, function* () {
